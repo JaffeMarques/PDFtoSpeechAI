@@ -1,0 +1,5 @@
+.env
+myenv/
+input/
+output/
+chunks/
