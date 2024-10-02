@@ -3,3 +3,4 @@ myenv/
 input/
 output/
 chunks/
+__pycache__/

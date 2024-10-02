@@ -1,15 +1,45 @@
 import os
-from dotenv import load_dotenv
-import time
-import pdfplumber
 import re
-from pathlib import Path
-import openai
+import time
+import config
+import pdfplumber
 from pydub import AudioSegment
 from moviepy.editor import concatenate_audioclips, AudioFileClip
-import azure.cognitiveservices.speech as speechsdk
+from tts_providers.azure_tts import convert_text_to_speech_azure
+from tts_providers.amazon_tts import convert_text_to_speech_amazon
 
-load_dotenv()
+def process_input_folder():
+    input_folder = config.INPUT_FOLDER
+    base_filenames = []
+    for filename in os.listdir(input_folder):
+        file_path = os.path.join(input_folder, filename)
+        if os.path.isfile(file_path):
+            base_name, extension = os.path.splitext(filename)
+            print(f"Processing file: {filename}")
+            base_filenames.append(base_name)
+
+    return base_filenames
+
+def convert_chunks_to_audio(chunks, output_folder, reprocess=[]):
+    audio_files = []
+    for i, chunk in enumerate(chunks):
+        if reprocess:
+            if (i + 1) in reprocess:
+                print(f"> & Reprocessing chunk {i+1}")
+            else:
+                continue
+        
+        print(f"> Processing chunk {i+1}")
+        output_file = os.path.join(output_folder, f"chunk_{i+1}.mp3")
+        tts_provider = config.TTS_PROVIDER
+        if(tts_provider == 'azure'):
+            convert_text_to_speech_azure(chunk, output_file)
+        elif (tts_provider == 'aws'):
+            convert_text_to_speech_amazon(chunk, output_file)
+            
+        audio_files.append(output_file)
+
+    return audio_files
 
 def pdf_to_markdown(pdf_path):
     with pdfplumber.open(pdf_path) as pdf:
@@ -36,16 +66,6 @@ def markdown_to_plain_text(markdown_text):
 
     return text
 
-def prepare_ssml_text(text):
-    # Substitui os símbolos de pontuação por pausas
-    text = text.replace('.', '<break time="500ms"/>')
-    text = text.replace(',', '<break time="300ms"/>')
-    text = text.replace(';', '<break time="400ms"/>')
-    text = text.replace(':', '<break time="400ms"/>')
-    text = text.replace('!', '<break time="500ms"/>')
-    text = text.replace('?', '<break time="500ms"/>')
-    return text
-
 def split_text(text, max_chunk_size=4096):
     chunks = []
     current_chunk = ""
@@ -65,58 +85,6 @@ def split_text(text, max_chunk_size=4096):
         chunks.append(current_chunk)
 
     return chunks
-
-def text_to_speech(input_text, output_file, api_key=os.getenv('AZURE_SPEACH_SECRET'), region=os.getenv('AZURE_SPEACH_REGION'), language_code='pt-BR', voice_name='pt-BR-ThalitaNeural'):
-    speech_config = speechsdk.SpeechConfig(subscription=api_key, region=region)
-    speech_config.speech_synthesis_language = language_code
-    speech_config.speech_synthesis_voice_name = voice_name
-
-    audio_config = speechsdk.audio.AudioOutputConfig(filename=output_file)
-
-    # Prepara o texto SSML
-    ssml_text = f'''
-    <speak version="1.0" xml:lang="{language_code}">
-        <voice name="{voice_name}">
-            {prepare_ssml_text(input_text)}
-        </voice>
-    </speak>
-    '''
-
-    synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
-
-    try:
-        result = synthesizer.speak_ssml_async(ssml_text).get()
-
-        if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
-            print(f'> Audio saved to {output_file}')
-        elif result.reason == speechsdk.ResultReason.Canceled:
-            cancellation_details = result.cancellation_details
-            print(f'* Error: {result.reason}')
-            print(f'* Cancellation reason: {cancellation_details.reason}')
-            print(f'* Error code: {cancellation_details.error_code}')
-            if cancellation_details.error_details:
-                print(f'* Error details: {cancellation_details.error_details}')
-            print("* Please check your input text and configuration.")
-    except Exception as e:
-        print(f"* An exception occurred: {e}")
-    
-    time.sleep(1)
-
-def convert_chunks_to_audio(chunks, output_folder, reprocess=[]):
-    audio_files = []
-    for i, chunk in enumerate(chunks):
-        if reprocess:
-            if (i + 1) in reprocess:
-                print(f"> & Reprocessing chunk {i+1}")
-            else:
-                continue
-        
-        print(f"> Processing chunk {i+1}")
-        output_file = os.path.join(output_folder, f"chunk_{i+1}.mp3")
-        text_to_speech(chunk, output_file)
-        audio_files.append(output_file)
-
-    return audio_files
 
 def combine_audio_with_moviepy(folder_path, output_file):
     audio_clips = []
@@ -157,7 +125,7 @@ def combine_audio_with_pydub(folder_path, output_file):
         print("No audio clips to combine.")
 
 def process_file(filename):
-    pdf_path = f'input/{filename}.pdf'
+    pdf_path = f'{config.INPUT_FOLDER}/{filename}.pdf'
     markdown_text = pdf_to_markdown(pdf_path)
     print('> Marked ready')
 
@@ -175,26 +143,6 @@ def process_file(filename):
     convert_chunks_to_audio(chunks, output_folder)
     print('> Chunks ready')
 
-    combine_audio_with_moviepy('chunks', f'output/{filename}.mp3')
+    combine_audio_with_moviepy('chunks', f'{config.OUTPUT_FOLDER}/{filename}.mp3')
     # combine_audio_with_pydub('chunks', f'output/{filename}.mp3')
     print('> Audio ready')
-
-def process_input_folder(input_folder):
-    base_filenames = []
-    for filename in os.listdir(input_folder):
-        file_path = os.path.join(input_folder, filename)
-        if os.path.isfile(file_path):
-            base_name, extension = os.path.splitext(filename)
-            print(f"Processing file: {filename}")
-            base_filenames.append(base_name)
-
-    return base_filenames
-
-def main():
-    folder = 'input'
-    files = process_input_folder(folder)
-    for file in files:
-        process_file(file)
-
-if __name__ == "__main__":
-    main()
