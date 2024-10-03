@@ -66,7 +66,7 @@ def markdown_to_plain_text(markdown_text):
 
     return text
 
-def split_text(text, max_chunk_size=4096):
+def split_text(text, max_chunk_size=config.MAX_CHUNK_SIZE):
     chunks = []
     current_chunk = ""
 

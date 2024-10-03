@@ -1,10 +1,17 @@
-from util import prepare_ssml_text
+from util import create_ssml
 import boto3
 import os
 import time
+import config
 
-def convert_text_to_speech_amazon(text, output_file, aws_access_key, aws_secret_key, aws_region, language_code='pt-BR', voice_name='Camila'):
-    polly_client = boto3.client('polly')
+def convert_text_to_speech_amazon(text, output_file, language_code='pt-BR', voice_name='Ricardo'):
+    polly_client = boto3.client(
+        'polly',
+        aws_access_key_id=config.AWS_SPEACH_KEY,
+        aws_secret_access_key=config.AWS_SPEACH_SECRET,
+        region_name=config.AWS_SPEACH_REGION
+    )
+    text = create_ssml(text, language_code, voice_name)
 
     try:
         response = polly_client.synthesize_speech(
@@ -14,7 +21,6 @@ def convert_text_to_speech_amazon(text, output_file, aws_access_key, aws_secret_
             LanguageCode=language_code
         )
 
-        # Save the synthesized speech to an MP3 file
         with open(output_file, 'wb') as audio_file:
             audio_file.write(response['AudioStream'].read())
 

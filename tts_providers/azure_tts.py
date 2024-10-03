@@ -8,8 +8,8 @@ def convert_text_to_speech_azure(
     output_file, 
     api_key=config.AZURE_SPEACH_SECRET, 
     region=config.AZURE_SPEACH_REGION, 
-    language_code='pt-BR', 
-    voice_name='pt-BR-ThalitaNeural'
+    language_code=config.AZURE_SPEACH_LANGUAGE, 
+    voice_name=config.AZURE_SPEACH_VOICE
  ):
     speech_config = speechsdk.SpeechConfig(subscription=api_key, region=region)
     speech_config.speech_synthesis_language = language_code
@@ -35,4 +35,4 @@ def convert_text_to_speech_azure(
     except Exception as e:
         print(f"* An exception occurred: {e}")
     
-    time.sleep(1)
+    time.sleep(5)
