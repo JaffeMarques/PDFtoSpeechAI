@@ -4,7 +4,7 @@ import os
 import time
 import config
 
-def convert_text_to_speech_amazon(text, output_file, language_code='pt-BR', voice_name='Ricardo'):
+def convert_text_to_speech_amazon(text, output_file, language_code=config.AWS_SPEACH_LANGUAGE, voice_name=config.AWS_SPEACH_VOICE):
     polly_client = boto3.client(
         'polly',
         aws_access_key_id=config.AWS_SPEACH_KEY,
@@ -18,7 +18,8 @@ def convert_text_to_speech_amazon(text, output_file, language_code='pt-BR', voic
             Text=text,
             OutputFormat='mp3',
             VoiceId=voice_name,
-            LanguageCode=language_code
+            LanguageCode=language_code,
+            TextType='ssml'
         )
 
         with open(output_file, 'wb') as audio_file:

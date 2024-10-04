@@ -89,7 +89,7 @@ def split_text(text, max_chunk_size=config.MAX_CHUNK_SIZE):
 def combine_audio_with_moviepy(folder_path, output_file):
     audio_clips = []
 
-    for file_name in sorted(os.listdir(folder_path)):
+    for file_name in sorted(os.listdir(folder_path), key=natural_sort_key):
         if file_name.endswith('.mp3'):
             file_path = os.path.join(folder_path, file_name)
             print(f"Processing file: {file_path}")
@@ -123,6 +123,9 @@ def combine_audio_with_pydub(folder_path, output_file):
         print(f"Combined audio saved to {output_file}")
     else:
         print("No audio clips to combine.")
+
+def natural_sort_key(file_name):
+    return [int(text) if text.isdigit() else text for text in re.split(r'(\d+)', file_name)]
 
 def process_file(filename):
     pdf_path = f'{config.INPUT_FOLDER}/{filename}.pdf'
