@@ -7,6 +7,7 @@ from pydub import AudioSegment
 from moviepy.editor import concatenate_audioclips, AudioFileClip
 from tts_providers.azure_tts import convert_text_to_speech_azure
 from tts_providers.amazon_tts import convert_text_to_speech_amazon
+from tts_providers.openai_tts import convert_text_to_speech_openai
 
 def process_input_folder():
     input_folder = config.INPUT_FOLDER
@@ -36,6 +37,8 @@ def convert_chunks_to_audio(chunks, output_folder, reprocess=[]):
             convert_text_to_speech_azure(chunk, output_file)
         elif (tts_provider == 'aws'):
             convert_text_to_speech_amazon(chunk, output_file)
+        elif (tts_provider == 'openai'):
+            convert_text_to_speech_openai(chunk, output_file)
             
         audio_files.append(output_file)
 

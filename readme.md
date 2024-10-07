@@ -1,115 +1,147 @@
-# PDF to Audio Converter using Azure or AWS Text-to-Speech
+# PDF to Audio Converter using Azure, AWS, or OpenAI Text-to-Speech
 
-This project converts PDF files into audio files using Azure's or AWS Text-to-Speech service. It extracts text from PDFs, processes it, and generates high-quality audio output, making it ideal for creating audiobooks or listening to documents on the go.
+This project converts PDF files into high-quality audio files using Azure, AWS, or OpenAI Text-to-Speech services. It extracts text from PDFs, processes it, and generates audio output, making it ideal for creating audiobooks or listening to documents on the go. 
+
+**Note:** This project is primarily intended for educational purposes and as a study tool for working with different Text-to-Speech APIs and PDF processing. While functional, it may not be optimized for large-scale or production use.
 
 ## Table of Contents
 
-- [Description](#description)
+- [Features](#features)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Setup](#setup)
 - [Usage](#usage)
+- [Configuration](#configuration)
 - [Notes](#notes)
+- [Troubleshooting](#troubleshooting)
 - [Dependencies](#dependencies)
+- [Contributing](#contributing)
 - [License](#license)
 
----
+## Features
 
-## Description
-
-The application reads PDF files from an `input` directory, extracts and splits the text into manageable chunks, and then uses Azure's or AWS Cognitive Services to convert each chunk into an audio file. The audio files are saved in the `output` directory. This allows for easy conversion of lengthy PDFs into accessible audio formats.
-
----
+- Support for multiple Text-to-Speech providers: Azure, AWS, and OpenAI
+- Batch processing of multiple PDF files
+- Automatic text chunking for efficient processing
+- Customizable voice and language settings
+- Error handling and logging
 
 ## Prerequisites
 
-- **Azure or AWS Account**: An active Azure or AWS account with access to the Speech service.
-- **Azure or AWS Speech Service Credentials**: Your account Speech API key and region.
-- **Python**: Version 3.12 installed on your system.
-- **pip**: Version 23.0 or higher for package management.
-
----
+- An active account with one of the following services:
+  - Azure Cognitive Services
+  - AWS Polly
+  - OpenAI
+- API credentials for the chosen service
+- Python 3.12 or higher
+- pip 23.0 or higher
 
 ## Installation
 
-### 1. Clone the Repository
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/JaffeMarques/PDFtoSpeechAI.git
+   cd PDFtoSpeechAI
+   ```
 
-```bash
-git clone https://github.com/JaffeMarques/pdf_to_mp3.git
-cd pdf_to_mp3
-```
+2. Set up a virtual environment:
+   ```bash
+   python3 -m venv myenv
+   source myenv/bin/activate  # On Windows, use `myenv\Scripts\activate`
+   ```
 
-### 2. Set Up a Virtual Environment
-
-It's recommended to use a virtual environment to manage dependencies.
-
-```bash
-python3 -m venv myenv
-```
-
-Activate the virtual environment:
-
-```bash
-source myenv/bin/activate
-```
-
-### 3. Install Dependencies
-
-Install the required Python packages using pip:
-
-```bash
-pip install -r requirements.txt
-```
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 ## Setup
 
-### 1. Create Required Directories
+1. Create required directories:
+   ```bash
+   mkdir input chunks output
+   ```
 
-In the project root directory, create the following folders:
+2. Configure environment variables:
+   The project includes an `env.example` file with all the necessary environment variables. To set up your configuration:
 
-```bash
-mkdir input chunks output
-```
+   a. Copy the `env.example` file to `.env`:
+      ```bash
+      cp env.example .env
+      ```
 
-- input: Place your PDF files here.
-- chunks: This folder will store the text chunks extracted from the PDFs.
-- output: The generated audio files will be saved here.
+   b. Open the `.env` file and fill in your credentials and preferences:
 
-### 2. Configure credentials
+   ```plaintext
+   # Choose your provider (azure, aws, or openai)
+   TTS_PROVIDER=
 
-Create a .env file in the project root directory to store your credentials securely.
+   # General settings
+   MAX_CHUNK_SIZE=1000
+   SLOW_DOWN_RATE=
 
-```bash
-touch .env
-```
+   # OpenAI credentials
+   OPENAI_SPEACH_SECRET=
+   OPENAI_SPEACH_VOICE=
+   OPENAI_SPEACH_MODEL=tts-1
 
-Add your credentials and configurations on the .env file.
+   # Azure credentials
+   AZURE_SPEACH_SECRET=
+   AZURE_SPEACH_REGION=
+   AZURE_SPEACH_VOICE=
+   AZURE_SPEACH_LANGUAGE=
+
+   # AWS credentials
+   AWS_SPEACH_KEY=
+   AWS_SPEACH_SECRET=
+   AWS_SPEACH_REGION=
+   AWS_SPEACH_VOICE=
+   AWS_SPEACH_LANGUAGE=
+   ```
+
+   Fill in the appropriate values for your chosen provider and preferences. You only need to fill in the credentials for the provider you're using.
 
 ## Usage
 
-### 1. Place PDF Files in the Input Folder
+1. Place PDF files in the `input` folder.
 
-Copy or move the PDF files you wish to convert into the input directory.
+2. Run the conversion script:
+   ```bash
+   python main.py
+   ```
 
-### 2. Run the Conversion Script
+3. Find the generated audio files in the `output` folder.
 
-Execute the main Python script:
+## Configuration
 
-```bash
-python main.py
-```
+You can customize the following settings in the `.env` file:
 
-The script will perform the following steps:
+- `TTS_PROVIDER`: Choose between 'azure', 'aws', or 'openai'
+- `MAX_CHUNK_SIZE`: Maximum number of characters per text chunk
+- `SLOW_DOWN_RATE`: Adjust the speech rate (if supported by the provider)
+- Provider-specific settings like voice, language, and region
 
-- **Read PDFs**: Scans the input folder for PDF files.
-- **Extract Text**: Converts the PDF content into text.
-- **Split Text into Chunks**: Breaks down large texts into smaller chunks for processing.
-- **Convert Text to Audio**: Uses Text-to-Speech to generate audio files from text chunks.
-- **Save Audio Files**: Outputs the audio files into the output folder.
+## Notes
 
-### Notes
+- This project is designed for educational purposes and may not be suitable for production environments without further optimization.
+- Be mindful of service limits and quotas to avoid throttling or additional charges.
+- Large PDFs may take considerable time to process.
+- The script includes basic error handling, but you may need to implement additional checks for specific use cases.
 
-- **Azure or AWS Limits**: Be mindful of Azure's or AWS service limits and quotas. Excessive use may result in throttling or additional charges.
-- **Folder Structure**: Ensure the input, chunks, and output folders exist in the project root to avoid runtime errors.
-- **Voice and Language Settings**: You can customize the voice name and language code in the script to suit your preferences.
-- **Error Handling**: The script includes basic error handling, but additional checks can be implemented as needed.
+## Troubleshooting
+
+- If you encounter "File not found" errors, ensure that the `input`, `chunks`, and `output` folders exist in the project root.
+- For API-related issues, verify your credentials in the `.env` file and check your account status with the chosen provider.
+- If the audio quality is not satisfactory, try adjusting the `MAX_CHUNK_SIZE` or experimenting with different voice settings.
+
+## Dependencies
+
+See `requirements.txt` for a full list of dependencies.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
