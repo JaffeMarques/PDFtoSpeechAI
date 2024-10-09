@@ -1,6 +1,6 @@
-# PDF to Audio Converter using Azure, AWS, or OpenAI Text-to-Speech
+# PDF to Audio Converter using Azure, AWS, Eleven Labs, or OpenAI Text-to-Speech
 
-This project converts PDF files into high-quality audio files using Azure, AWS, or OpenAI Text-to-Speech services. It extracts text from PDFs, processes it, and generates audio output, making it ideal for creating audiobooks or listening to documents on the go. 
+This project converts PDF files into high-quality audio files using Azure, AWS, Eleven Labs, or OpenAI Text-to-Speech services. It extracts text from PDFs, processes it, and generates audio output, making it ideal for creating audiobooks or listening to documents on the go. 
 
 **Note:** This project is primarily intended for educational purposes and as a study tool for working with different Text-to-Speech APIs and PDF processing. While functional, it may not be optimized for large-scale or production use.
 
@@ -20,7 +20,7 @@ This project converts PDF files into high-quality audio files using Azure, AWS, 
 
 ## Features
 
-- Support for multiple Text-to-Speech providers: Azure, AWS, and OpenAI
+- Support for multiple Text-to-Speech providers: Azure, AWS, elevenlabs, and OpenAI
 - Batch processing of multiple PDF files
 - Automatic text chunking for efficient processing
 - Customizable voice and language settings
@@ -31,6 +31,7 @@ This project converts PDF files into high-quality audio files using Azure, AWS, 
 - An active account with one of the following services:
   - Azure Cognitive Services
   - AWS Polly
+  - Eleven Labs
   - OpenAI
 - API credentials for the chosen service
 - Python 3.12 or higher
@@ -73,12 +74,17 @@ This project converts PDF files into high-quality audio files using Azure, AWS, 
    b. Open the `.env` file and fill in your credentials and preferences:
 
    ```plaintext
-   # Choose your provider (azure, aws, or openai)
+   # Choose your provider (azure, aws, elevenlabs, or openai)
    TTS_PROVIDER=
 
    # General settings
    MAX_CHUNK_SIZE=1000
    SLOW_DOWN_RATE=
+
+   # Eleven Labs credentials
+   ELEVENLABS_SPEACH_SECRET=
+   ELEVENLABS_SPEACH_URL=
+   ELEVENLABS_SPEACH_VOICE_ID=
 
    # OpenAI credentials
    OPENAI_SPEACH_SECRET=
@@ -116,7 +122,7 @@ This project converts PDF files into high-quality audio files using Azure, AWS, 
 
 You can customize the following settings in the `.env` file:
 
-- `TTS_PROVIDER`: Choose between 'azure', 'aws', or 'openai'
+- `TTS_PROVIDER`: Choose between 'azure', 'aws', 'elevenlabs', or 'openai'
 - `MAX_CHUNK_SIZE`: Maximum number of characters per text chunk
 - `SLOW_DOWN_RATE`: Adjust the speech rate (if supported by the provider)
 - Provider-specific settings like voice, language, and region

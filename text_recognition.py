@@ -8,6 +8,7 @@ from moviepy.editor import concatenate_audioclips, AudioFileClip
 from tts_providers.azure_tts import convert_text_to_speech_azure
 from tts_providers.amazon_tts import convert_text_to_speech_amazon
 from tts_providers.openai_tts import convert_text_to_speech_openai
+from tts_providers.elevenlabs_tts import convert_text_to_speech_elevenlabs
 
 def process_input_folder():
     input_folder = config.INPUT_FOLDER
@@ -39,6 +40,8 @@ def convert_chunks_to_audio(chunks, output_folder, reprocess=[]):
             convert_text_to_speech_amazon(chunk, output_file)
         elif (tts_provider == 'openai'):
             convert_text_to_speech_openai(chunk, output_file)
+        elif (tts_provider == 'elevenlabs'):
+            convert_text_to_speech_elevenlabs(chunk, output_file)
             
         audio_files.append(output_file)
 
@@ -143,8 +146,8 @@ def process_file(filename):
 
     output_folder = "chunks"
 
-    #reprocess = [137, 142]
-    #convert_chunks_to_audio(chunks, output_folder, reprocess)
+    # reprocess = [92, 93]
+    # convert_chunks_to_audio(chunks, output_folder, reprocess)
 
     convert_chunks_to_audio(chunks, output_folder)
     print('> Chunks ready')
