@@ -2,8 +2,6 @@
 
 This project converts PDF files into high-quality audio files using Azure, AWS, Eleven Labs, or OpenAI Text-to-Speech services. It extracts text from PDFs, processes it, and generates audio output, making it ideal for creating audiobooks or listening to documents on the go. 
 
-**Note:** This project is primarily intended for educational purposes and as a study tool for working with different Text-to-Speech APIs and PDF processing. While functional, it may not be optimized for large-scale or production use.
-
 ## Table of Contents
 
 - [Features](#features)
